@@ -1,0 +1,149 @@
+#![allow(unused)]
+
+use super::tok::*;
+
+
+fn check_single_char<'a>(word: &'a str) -> Option<Token<'a>> {
+    macro_rules! tok {
+	($tt:expr) => {
+	    Some(Token::new($tt, word))
+	};
+    };
+
+    let tok = match word {
+	";" => tok!(Semicolon),
+	"=" => tok!(Equal),
+	"(" => tok!(LeftParen),
+	")" => tok!(RightParen),
+	"{" => tok!(LeftBrace),
+	"}" => tok!(RightBrace),
+	"," => tok!(Comma),
+        "." => tok!(Dot),
+        "-" => tok!(Minus),
+        "+" => tok!(Plus),
+        "/" => tok!(Slash),
+        "*" => tok!(Star),
+        "%" => tok!(Percent),
+        "!" => tok!(Bang),
+        ":" => tok!(Colon),
+        "<" => tok!(Less),
+        ">" => tok!(Greater),
+
+	_ => None
+    };
+
+    tok
+}
+
+fn check_keyword<'a>(word: &'a str) -> Option<Token<'a>> {
+    macro_rules! tok {
+	($tt:expr) => {
+	    Some(Token::new($tt, word))
+	};
+    };
+    
+    let tok = match word {
+        "fn" => tok!(Fn),
+        "let" => tok!(Let),
+        "if" => tok!(If),
+        "else" => tok!(Else),
+        "while" => tok!(While),
+        "elif" => tok!(Elif),
+        "return" => tok!(Return),
+        "for" => tok!(For),
+        "in" => tok!(In),
+        "break" => tok!(Break),
+        "continue" => tok!(Continue),
+        "true" => tok!(True),
+        "false" => tok!(False),
+
+        _ => None
+    };
+
+    tok
+}
+
+fn check_two_char<'a>(word: &'a str) -> Option<Token<'a>> {
+    macro_rules! tok {
+        ($tt:expr) => {
+            Some(Token::new($tt, word))
+        };
+    };
+
+    let tok = match word {
+        "==" => tok!(EqualEqual),
+        "!=" => tok!(BangEqual),
+        "<=" => tok!(LessEqual),
+        ">=" => tok!(GreaterEqual),
+
+        _ => None
+    };
+
+    tok
+}
+
+fn match_string_literal<'a>(word: &'a str) -> Option<Token<'a>> {
+    macro_rules! tok {
+        ($tt:expr) => {
+            Some(Token::new($tt, word))
+        };
+    };
+
+    
+    let chars = word.chars();
+
+    if word.starts_with("\"") {
+	while let Some(char) = chars.next() {
+	    if char == '\"' {
+		return tok!(String);
+	    }
+	}
+    }
+    if word.starts_with("\'") {
+	while let Some(char) = chars.next() {
+	    if char == '\'' {
+		return tok!(String);
+	    }
+	}
+    }
+
+    None
+}
+
+fn match_int_literal<'a>(word: &'a str) -> Option<Token<'a>> {
+    macro_rules! tok {
+        ($tt:expr) => {
+            Some(Token::new($tt, word))
+        };
+    };
+
+    let chars = word.chars();
+
+    while let Some(char) = chars.next() {
+	if char.is_digit(10) {
+	    return tok!(Number);
+	} else {
+	    return None;
+	}
+    }
+
+    None
+}
+
+fn match_identifier<'a>(word: &'a str) -> Option<Token<'a>> {
+    macro_rules! tok {
+        ($tt:expr) => {
+            Some(Token::new($tt, word))
+        };
+    };
+
+    let chars = word.chars();
+
+    if chars.next().is_ascii_alphabetic() {
+	while let Some(char) = chars.next() {
+	    if chars.next().is_ascii() {
+		
+	    }
+	}
+    }
+}
