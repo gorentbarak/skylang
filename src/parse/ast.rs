@@ -1,7 +1,9 @@
 #[derive(Debug)]
 pub enum Expr<'a> {
     MathExpr(Math),
-    FunCallExpr(FunCall<'a>),
+    FunCall(FunCall<'a>),
+    FunDefenition(FunDefenition<'a>),
+    VarDefenition(VarDefenition<'a>),
 }
 
 // MATH EXPRESSION
@@ -26,19 +28,31 @@ pub enum MathOperator {
 
 #[derive(Debug)]
 pub struct FunCall<'a> {
-    name: &'a str,
-    params: Vec<FunParam<'a>>,
+    pub name: &'a str,
+    pub params: Vec<FunParamCall>,
 }
 
 #[derive(Debug)]
-pub struct FunDefention<'a> {
+pub struct FunDefenition<'a> {
     name: &'a str,
-    params: Vec<FunParam<'a>>,
+    params: Vec<FunParamDef<'a>>,
     contents: Vec<Expr<'a>>,
-    return_value: Expr<'a>,
+    return_value: &'a Expr<'a>,
 }
 
 #[derive(Debug)]
-pub struct FunParam<'a> {
+pub struct FunParamDef<'a> {
     name: &'a str,
+}
+
+#[derive(Debug)]
+pub struct FunParamCall {
+    // Everything is a u64 for now.
+    pub value: u64,
+}
+
+#[derive(Debug)]
+pub struct VarDefenition<'a> {
+    pub name: &'a str,
+    pub value: u64,
 }
