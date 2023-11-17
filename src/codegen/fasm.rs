@@ -91,8 +91,8 @@ pub fn fasm_codegen(exprs: Vec<Expr>) -> String {
 		asm_text.push_str(format!("call {}", e.name).as_str());
 	    },
 
-	    Expr::VarDefenition(e) => {
-			asm_data.push_str(format!("\t{} dq {}", e.name, e.value.unwrap()).as_str());
+	    Expr::VarDefinition(e) => {
+		asm_data.push_str(format!("\t{} dq {}", e.name, e.value.unwrap()).as_str());
 	    },
 
 	    Expr::VarReference(e) => {

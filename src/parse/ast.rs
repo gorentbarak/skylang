@@ -2,8 +2,8 @@
 pub enum Expr<'a> {
     MathExpr(Math<'a>),
     FunCall(FunCall<'a>),
-    FunDefenition(FunDefenition<'a>),
-    VarDefenition(VarDefenition<'a>),
+    FunDefinition(FunDefinition<'a>),
+    VarDefinition(VarDefinition<'a>),
     VarReference(VarReference<'a>),
     Breakpoint
 }
@@ -35,7 +35,7 @@ pub struct FunCall<'a> {
 }
 
 #[derive(Debug)]
-pub struct FunDefenition<'a> {
+pub struct FunDefinition<'a> {
     name: &'a str,
     params: Vec<FunParamDef<'a>>,
     contents: Vec<Expr<'a>>,
@@ -45,6 +45,7 @@ pub struct FunDefenition<'a> {
 #[derive(Debug)]
 pub struct FunParamDef<'a> {
     name: &'a str,
+    number: u8,
 }
 
 #[derive(Debug)]
@@ -55,7 +56,7 @@ pub struct FunParamCall<'a> {
 // VARIABLES
 
 #[derive(Debug)]
-pub struct VarDefenition<'a> {
+pub struct VarDefinition<'a> {
     pub name: &'a str,
     pub value: Value<'a>,
 }
