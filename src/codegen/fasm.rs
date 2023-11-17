@@ -27,9 +27,9 @@ pub fn fasm_codegen(expr: Expr) -> String {
 		// If the operator is division.
 		MathOperator::OP_DIV => {
 		    asm_text.push_str("\tmov rax, r10\n");
-		    asm_text.push_str("\tmov rdx, r11\n");
-		    asm_text.push_str("\tidiv r10, r11\n");
-		    asm_text.push_str("\tmov rax, r10\n");
+		    asm_text.push_str("\txor rdx, rdx\n");
+		    asm_text.push_str("\tidiv r11\n");
+		    // The quotient is now stored in %rax.
 		},
 		// If the operators is subtraction.
 		MathOperator::OP_SUB => {
@@ -39,10 +39,10 @@ pub fn fasm_codegen(expr: Expr) -> String {
 		// If the operator is modulo.
 		MathOperator::OP_MOD => {
 		    asm_text.push_str("\tmov rax, r10\n");
-		    asm_text.push_str("\tmov rdx, r11\n");
-		    asm_text.push_str("\tidiv r10, r11\n");
+		    asm_text.push_str("\txor rdx, rdx\n");
+		    asm_text.push_str("\tidiv r11\n");
 		    asm_text.push_str("\tmov rax, rdx\n");
-
+		    // The remainder will now be stored in the %rax register. 
 		}
 	    }
 	},
@@ -91,11 +91,18 @@ pub fn fasm_codegen(expr: Expr) -> String {
 	},
 
 	Expr::VarDefenition(e) => {
-	    asm_data.push_str(format!("{} dq {:?}", e.name, e.value).as_str());
+	    asm_data.push_str(format!("\t{} dq {:?}", e.name, e.value).as_str());
+	},
+
+	Expr::VarReference(e) => {
+	    asm_text.push_str(e.name);
 	},
 	
 	_ => unimplemented!("sorry unimplemented"),
     }
+    asm_text.push_str("\tmov rax, 60        ; 60 is the system call number for exit.\n");
+    asm_text.push_str("\txor rdi, rdi       ; 0 is the exit code we want.\n");
+    asm_text.push_str("\tsyscall            ; this is the instruction to actually perform the system call.");
     let asm = format!("{}{}", asm_text, asm_data);
     println!("{}", asm);
     asm

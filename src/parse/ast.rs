@@ -4,6 +4,7 @@ pub enum Expr<'a> {
     FunCall(FunCall<'a>),
     FunDefenition(FunDefenition<'a>),
     VarDefenition(VarDefenition<'a>),
+    VarReference(VarReference<'a>),
 }
 
 // MATH EXPRESSION
@@ -51,8 +52,15 @@ pub struct FunParamCall {
     pub value: u64,
 }
 
+// VARIABLES
+
 #[derive(Debug)]
 pub struct VarDefenition<'a> {
     pub name: &'a str,
     pub value: u64,
+}
+
+#[derive(Debug)]
+pub struct VarReference<'a> {
+    pub name: &'a str,
 }

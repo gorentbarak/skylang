@@ -5,8 +5,5 @@ use crate::parse::ast::*;
 pub mod parse;
 
 fn main() {
-    fasm_codegen(Expr::VarDefenition(VarDefenition {
-	name: "hi",
-	value: 100,
-    }));
+    fasm_codegen(Expr::MathExpr(Math { left: 30, right: 4, operator: MathOperator::OP_DIV}));
 }
