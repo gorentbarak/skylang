@@ -1,1 +1,1 @@
-# SkyLang
+# ![SkyLang](.images/slang-logo.png)  
