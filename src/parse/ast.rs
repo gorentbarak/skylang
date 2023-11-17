@@ -5,6 +5,7 @@ pub enum Expr<'a> {
     FunDefenition(FunDefenition<'a>),
     VarDefenition(VarDefenition<'a>),
     VarReference(VarReference<'a>),
+    Breakpoint
 }
 
 // MATH EXPRESSION
@@ -68,4 +69,18 @@ pub struct VarReference<'a> {
 pub enum Value<'a> {
     Var(VarReference<'a>),
     Number(u64),
+}
+
+impl<'a> Value<'a> {
+    pub fn unwrap(&self) -> String {
+	match self {
+	    Value::Number(e) => {
+		return e.to_string();
+	    },
+
+	    Value::Var(e) => {
+		return format!("[{}]", e.name.to_string());
+	    }
+	}
+    }
 }

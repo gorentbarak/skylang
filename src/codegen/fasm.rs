@@ -1,17 +1,5 @@
 use crate::parse::ast::*;
 
-pub fn parse_value(value: Value) -> String {
-    match value {
-	Value::Number(e) => {
-	    return e.to_string();
-	},
-
-	Value::Var(e) => {
-	    return e.name.to_string();
-	}
-    }
-}
-
 pub fn fasm_codegen(exprs: Vec<Expr>) -> String {
     let mut asm_text = String::new();
     let mut asm_data = String::new();
@@ -24,8 +12,8 @@ pub fn fasm_codegen(exprs: Vec<Expr>) -> String {
     for expr in exprs.iter() {	
 	match expr {
 	    Expr::MathExpr(e) => {
-		asm_text.push_str(format!("\tmov r10, {}\n", parse_value(e.left)).as_str());
-		asm_text.push_str(format!("\tmov r11, {}\n", parse_value(e.right)).as_str());
+		asm_text.push_str(format!("\tmov r10, {}\n", e.left.unwrap()).as_str());
+		asm_text.push_str(format!("\tmov r11, {}\n", e.right.unwrap()).as_str());
 		match e.operator {
 		    // If the operator is addition.
 		    MathOperator::OP_ADD => {
@@ -65,52 +53,56 @@ pub fn fasm_codegen(exprs: Vec<Expr>) -> String {
 		    match i {
 			0 => {
 			    // First parameter. Put in %rdi.
-			    asm_text.push_str(format!("\tmov rdi, {:?}\n", parse_value(p.value)).as_str());
+			    asm_text.push_str(format!("\tmov rdi, {}\n", p.value.unwrap()).as_str());
 			},
 
 			1 => {
 			    // Second parameter. Put in %rsi.
-			    asm_text.push_str(format!("\tmov rsi, {:?}\n", parse_value(p.value)).as_str());
+			    asm_text.push_str(format!("\tmov rsi, {}\n", p.value.unwrap()).as_str());
 			},
 
 			2 => {
 			    // Third parameter. Put in %rdx.
-			    asm_text.push_str(format!("\tmov rdx, {:?}\n", parse_value(p.value)).as_str());
+			    asm_text.push_str(format!("\tmov rdx, {}\n", p.value.unwrap()).as_str());
 			},
 
 			3 => {
 			    // Fourth parameter. Put in %rcx.
-			    asm_text.push_str(format!("\tmov rcx, {:?}\n", parse_value(p.value)).as_str());
+			    asm_text.push_str(format!("\tmov rcx, {}\n", p.value.unwrap()).as_str());
 			},
 
 			4 => {
 			    // Fifth parameter. Put in %r8.
-			    asm_text.push_str(format!("\tmov r8, {:?}\n", parse_value(p.value)).as_str());
+			    asm_text.push_str(format!("\tmov r8, {}\n", p.value.unwrap()).as_str());
 			},
 			
 			5 => {
 			    // Sixth parameter. Put in %r9.
-			    asm_text.push_str(format!("\tmov r9, {:?}\n", parse_value(p.value)).as_str());
+			    asm_text.push_str(format!("\tmov r9, {}\n", p.value.unwrap()).as_str());
 			},
 
 			_ => {
 			    // Parameters after the sixth parameter are pushed to the stack.
-			    asm_text.push_str(format!("\tpush {:?}\n", parse_value(p.value)).as_str());
+			    asm_text.push_str(format!("\tpush {}\n", p.value.unwrap()).as_str());
 			}
 		    }
 		}
 
-		asm_text.push_str(format!("call {:?}", e.name).as_str());
+		asm_text.push_str(format!("call {}", e.name).as_str());
 	    },
 
 	    Expr::VarDefenition(e) => {
-			asm_data.push_str(format!("\t{} db {:?}", e.name, parse_value(e.value)).as_str());
+			asm_data.push_str(format!("\t{} dq {}", e.name, e.value.unwrap()).as_str());
 	    },
 
 	    Expr::VarReference(e) => {
 		asm_text.push_str(e.name);
 	    },
-	
+
+	    Expr::Breakpoint => {
+		asm_text.push_str("\tint3\n");
+	    },
+	    
 	    _ => unimplemented!("sorry unimplemented"),
 	}
     }
