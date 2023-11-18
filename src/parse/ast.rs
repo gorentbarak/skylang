@@ -39,13 +39,13 @@ pub struct FunDefinition<'a> {
     name: &'a str,
     params: Vec<FunParamDef<'a>>,
     contents: Vec<Expr<'a>>,
-    return_value: &'a Expr<'a>,
+    return_value: Value<'a>,
 }
 
 #[derive(Debug)]
 pub struct FunParamDef<'a> {
     name: &'a str,
-    number: u8,
+    number: u64,
 }
 
 #[derive(Debug)]
@@ -67,14 +67,24 @@ pub struct VarReference<'a> {
 }
 
 #[derive(Debug, Copy, Clone)]
+pub struct ParamReference<'a> {
+    pub param_number: u64,
+}
+
+#[derive(Debug, Copy, Clone)]
 pub enum Value<'a> {
     Var(VarReference<'a>),
+    Param(ParamReference<'a>),
     Number(u64),
 }
 
 impl<'a> Value<'a> {
     pub fn unwrap(&self) -> String {
 	match self {
+	    Value::Param(e) => {
+		
+	    },
+	    
 	    Value::Number(e) => {
 		return e.to_string();
 	    },
