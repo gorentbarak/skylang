@@ -4,7 +4,7 @@ pub enum Expr<'a> {
     FunCall(FunCall<'a>),
     FunDefinition(FunDefinition<'a>),
     VarDefinition(VarDefinition<'a>),
-    VarReference(VarReference<'a>),
+    Return(Value<'a>),
     Breakpoint
 }
 
@@ -36,10 +36,8 @@ pub struct FunCall<'a> {
 
 #[derive(Debug)]
 pub struct FunDefinition<'a> {
-    name: &'a str,
-    params: Vec<FunParamDef<'a>>,
-    contents: Vec<Expr<'a>>,
-    return_value: Value<'a>,
+    pub name: &'a str,
+    pub contents: Vec<Expr<'a>>,
 }
 
 #[derive(Debug)]
@@ -67,14 +65,14 @@ pub struct VarReference<'a> {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub struct ParamReference<'a> {
+pub struct ParamReference {
     pub param_number: u64,
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum Value<'a> {
     Var(VarReference<'a>),
-    Param(ParamReference<'a>),
+    Param(ParamReference),
     Number(u64),
 }
 
@@ -82,7 +80,15 @@ impl<'a> Value<'a> {
     pub fn unwrap(&self) -> String {
 	match self {
 	    Value::Param(e) => {
-		
+		match e.param_number {
+		    0 => { return "rdi".to_string(); },
+		    1 => { return "rsi".to_string(); },
+		    2 => { return "rdx".to_string(); },
+		    3 => { return "rcx".to_string(); },
+		    4 => { return  "r8".to_string(); },
+		    5 => { return  "r9".to_string(); },
+		    _ => { unimplemented!() }
+		}
 	    },
 	    
 	    Value::Number(e) => {
