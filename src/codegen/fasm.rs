@@ -124,6 +124,5 @@ pub fn fasm_codegen(exprs: &Vec<Expr>, not_a_function: bool) -> String {
     }
     
     let asm = format!("{}{}{}", asm_start, asm_text, asm_data);
-    println!("{}", asm);
     asm
 }
