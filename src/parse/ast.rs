@@ -74,6 +74,7 @@ pub enum Value<'a> {
     Var(VarReference<'a>),
     Param(ParamReference),
     Number(u64),
+    Math(Math),
 }
 
 impl<'a> Value<'a> {
@@ -97,7 +98,11 @@ impl<'a> Value<'a> {
 
 	    Value::Var(e) => {
 		return format!("[{}]", e.name.to_string());
-	    }
+	    },
+
+            Value::Math(e) => {
+                return String::from("rax");
+            }
 	}
     }
 }
