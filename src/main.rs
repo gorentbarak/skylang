@@ -18,16 +18,25 @@ fn main() {
                               ),
                               Expr::FunDefinition(FunDefinition {
                                   name: "adder", contents: vec![
-                                      Expr::Return(Value::Math(
+                                      Expr::MathExpr(
                                           Math {
                                               left: &Value::Param(ParamReference {param_number: 0}),
                                               right: &Value::Param(ParamReference {param_number: 1}),
                                               operator: MathOperator::OP_ADD
                                           }
-                                      ))
+                                      )
                                   ]
                               }),
-                              Expr::Breakpoint],
+
+                              Expr::FunCall(
+                                  FunCall {
+                                      name: "adder",
+                                      params: vec![Value::Var(VarReference {name: "goren"}), Value::Number(6)]
+                                  }
+                              ),
+                              
+                              Expr::Breakpoint
+                          ],
                           true
     );
     println!("{}", fc);

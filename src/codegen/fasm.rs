@@ -58,42 +58,42 @@ pub fn fasm_codegen(exprs: &Vec<Expr>, not_a_function: bool) -> String {
 		    match i {
 			0 => {
 			    // First parameter. Put in %rdi.
-			    asm_start.push_str(format!("\tmov rdi, {}\n", p.value.unwrap()).as_str());
+			    asm_start.push_str(format!("\tmov rdi, {}\n", p.unwrap()).as_str());
 			},
 
 			1 => {
 			    // Second parameter. Put in %rsi.
-			    asm_start.push_str(format!("\tmov rsi, {}\n", p.value.unwrap()).as_str());
+			    asm_start.push_str(format!("\tmov rsi, {}\n", p.unwrap()).as_str());
 			},
 
 			2 => {
 			    // Third parameter. Put in %rdx.
-			    asm_start.push_str(format!("\tmov rdx, {}\n", p.value.unwrap()).as_str());
+			    asm_start.push_str(format!("\tmov rdx, {}\n", p.unwrap()).as_str());
 			},
 
 			3 => {
 			    // Fourth parameter. Put in %rcx.
-			    asm_start.push_str(format!("\tmov rcx, {}\n", p.value.unwrap()).as_str());
+			    asm_start.push_str(format!("\tmov rcx, {}\n", p.unwrap()).as_str());
 			},
 
 			4 => {
 			    // Fifth parameter. Put in %r8.
-			    asm_start.push_str(format!("\tmov r8, {}\n", p.value.unwrap()).as_str());
+			    asm_start.push_str(format!("\tmov r8, {}\n", p.unwrap()).as_str());
 			},
 
 			5 => {
 			    // Sixth parameter. Put in %r9.
-			    asm_start.push_str(format!("\tmov r9, {}\n", p.value.unwrap()).as_str());
+			    asm_start.push_str(format!("\tmov r9, {}\n", p.unwrap()).as_str());
 			},
 
 			_ => {
 			    // Parameters after the sixth parameter are pushed to the stack.
-			    asm_start.push_str(format!("\tpush {}\n", p.value.unwrap()).as_str());
+			    asm_start.push_str(format!("\tpush {}\n", p.unwrap()).as_str());
 			}
 		    }
 		}
 
-		asm_start.push_str(format!("call {}", e.name).as_str());
+		asm_start.push_str(format!("\tcall {}\n", e.name).as_str());
 	    },
 
 	    Expr::VarDefinition(e) => {
@@ -111,6 +111,7 @@ pub fn fasm_codegen(exprs: &Vec<Expr>, not_a_function: bool) -> String {
             Expr::FunDefinition(e) => {
                 asm_text.push_str(format!("{}:\n", e.name).as_str());
 	        asm_text.push_str(fasm_codegen(&e.contents, false).as_str());
+                asm_text.push_str("\tret\n");
             }
 
 	    _ => break,
@@ -118,12 +119,12 @@ pub fn fasm_codegen(exprs: &Vec<Expr>, not_a_function: bool) -> String {
         
     }
     
-    if not_a_function {
-	asm_start.push_str("\tmov rax, 60    ; 60 is the system call number for exit.\n");
-	asm_start.push_str("\txor rdi, rdi   ; 0 is the exit code we want.\n");
-	asm_start.push_str("\tsyscall        ; this is the instruction to actually perform the system call.\n");
-    }
 
+    if not_a_function {
+        asm_start.push_str("\tmov rax, 60    ; 60 is the system call number for exit.\n");
+        asm_start.push_str("\txor rdi, rdi   ; 0 is the exit code we want.\n");
+        asm_start.push_str("\tsyscall        ; this is the instruction to actually perform the system call.\n");
+    }
     let asm = format!("{}{}{}", asm_start, asm_text, asm_data);
     asm
 }
