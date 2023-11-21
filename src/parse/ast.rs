@@ -10,14 +10,14 @@ pub enum Expr<'a> {
 
 // MATH EXPRESSION
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Math<'a> {
-    pub left: Value<'a>,
-    pub right: Value<'a>,
+    pub left: &'a Value<'a>,
+    pub right: &'a Value<'a>,
     pub operator: MathOperator
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum MathOperator {
     OP_ADD,	// Addition
     OP_SUB,	// Subtraction
@@ -59,6 +59,7 @@ pub struct VarDefinition<'a> {
     pub value: Value<'a>,
 }
 
+
 #[derive(Debug, Copy, Clone)]
 pub struct VarReference<'a> {
     pub name: &'a str,
@@ -74,7 +75,7 @@ pub enum Value<'a> {
     Var(VarReference<'a>),
     Param(ParamReference),
     Number(u64),
-    Math(Math),
+    Math(Math<'a>),
 }
 
 impl<'a> Value<'a> {
