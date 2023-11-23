@@ -5,6 +5,7 @@ pub enum Expr<'a> {
     FunDefinition(FunDefinition<'a>),
     VarDefinition(VarDefinition<'a>),
     Return(Value<'a>),
+    If(IfStatement<'a>),
     Breakpoint
 }
 
@@ -75,6 +76,25 @@ pub enum Value<'a> {
     Var(VarReference<'a>),
     Param(ParamReference),
     Number(u64),
+}
+
+#[derive(Debug)]
+pub struct IfStatement<'a> {
+    pub condition: Condition<'a>,
+    pub if_true: Vec<Expr<'a>>,
+}
+
+#[derive(Debug)]
+pub struct Condition<'a> {
+    pub left: Value<'a>,
+    pub right: Value<'a>,
+    pub between: COND_OP,
+}
+
+#[derive(Debug)]
+pub enum COND_OP {
+    EQ,
+    NE,
 }
 
 impl<'a> Value<'a> {
