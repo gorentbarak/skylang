@@ -1,5 +1,16 @@
 use crate::parse::ast::*;
 
+
+macro_rules! fasm_codegen {
+    ($exprs:expr) => {
+	fasm_codegen($exprs, false)
+    };
+
+    (function: $exprs:expr) => {
+	fasm_codegen($exprs, true)
+    }
+}
+
 pub fn fasm_codegen(exprs: &Vec<Expr>, not_a_function: bool) -> String {
     // Define asm_func, used for functions.
     let mut asm_func = String::new();
@@ -130,19 +141,27 @@ pub fn fasm_codegen(exprs: &Vec<Expr>, not_a_function: bool) -> String {
 		asm_start.push_str("\tint3\n");
 	    },
 
+	    // Return something from a function.
 	    Expr::Return(e)        => {
-		asm_start.push_str(format!("mov [rbp - 8], {}", e.unwrap()).as_str());
+		// Move the return value to rbp + 8.
+		asm_start.push_str(format!("mov [rbp + 8], {}", e.unwrap()).as_str());
+		// [rbp + 8] ← return_value
 	    },
 
+	    // A function defenition.
             Expr::FunDefinition(e) => {
+		// In x86-64 assembly, a function is defined as <function_name>:. Push this to the `asm_func`.
                 asm_func.push_str(format!("{}:\n", e.name).as_str());
-	        asm_func.push_str(fasm_codegen(&e.contents, false).as_str());
+		// Call the function itself specifying that you are defining a function, and push the returned value to `asm_func`.
+	        asm_func.push_str(fasm_codegen!(function: &e.contents).as_str());
+		// Use the ret instruction to return from the procedure.
                 asm_func.push_str("\tret\n");
             },
 
 	    _ => unsafe {
-		let mut ptr = 0x00 as *mut u32;
-		::std::ptr::write(ptr, "GOREN IS MY NAME AND BREAKING MEMORY IS MY GAME");
+		// Write some data I randomly typed to your memory because don't going around playing with something that I haven't implemented yet.
+		let mut ptr = 0x00 as *mut f64;
+		::std::ptr::write(ptr, 124010240120401240.12410240124120401240);
 	    },
 	}
         
@@ -150,10 +169,13 @@ pub fn fasm_codegen(exprs: &Vec<Expr>, not_a_function: bool) -> String {
     
 
     if not_a_function {
+	// Use the exit syscall to leave the program. If you don't do this, you will get a segmentation fault.
         asm_start.push_str("\tmov rax, 60    ; 60 is the system call number for exit.\n");
         asm_start.push_str("\txor rdi, rdi   ; 0 is the exit code we want.\n");
         asm_start.push_str("\tsyscall        ; this is the instruction to actually perform the system call.\n");
     }
+    // Get the final `asm` string derived from all of the other strings that we have manipulated (finally!).
     let asm = format!("{}{}{}", asm_start, asm_func, asm_data);
+    // Return the final `asm` string.
     asm
 }
