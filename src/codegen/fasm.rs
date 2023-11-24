@@ -1,13 +1,14 @@
 use crate::parse::ast::*;
 
-
+#[macro_export]
 macro_rules! fasm_codegen {
+    // Macro to make calling fasm_codegen function easier.
     ($exprs:expr) => {
-	fasm_codegen($exprs, false)
+	fasm_codegen(&$exprs, true)
     };
 
     (function: $exprs:expr) => {
-	fasm_codegen($exprs, true)
+	fasm_codegen($exprs, false)
     }
 }
 
@@ -177,5 +178,6 @@ pub fn fasm_codegen(exprs: &Vec<Expr>, not_a_function: bool) -> String {
     // Get the final `asm` string derived from all of the other strings that we have manipulated (finally!).
     let asm = format!("{}{}{}", asm_start, asm_func, asm_data);
     // Return the final `asm` string.
+    
     asm
 }
