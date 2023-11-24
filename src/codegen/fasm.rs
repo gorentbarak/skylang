@@ -153,7 +153,7 @@ pub fn fasm_codegen(exprs: &Vec<Expr>, not_a_function: bool) -> String {
 	    // Return something from a function.
 	    Expr::Return(e)        => {
 		// Do the operation that should later be returned.
-		asm_start.push_str(fasm_codegen!(fun: &e));
+		asm_start.push_str(fasm_codegen!(fun: &e).as_str());
 		// Move the return value to rbp + 8.
 		asm_start.push_str("mov [rbp + 8], rax");
 		// 8(%rbp) ← return_value

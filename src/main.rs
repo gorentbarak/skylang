@@ -1,43 +1,46 @@
 #![allow(warnings)]
 
 pub mod lex;
+use crate::lex::tok::*;
 pub mod codegen;
 use crate::codegen::fasm::*;
 use crate::parse::ast::*;
 pub mod parse;
 
 fn main() {
-    let fc = fasm_codegen!(
-	vec![
-            Expr::VarDefinition(VarDefinition {name: "goren", value: Value::Number(10)}),
-            Expr::MathExpr(Math {
-                left: &Value::Var(VarReference { name: "goren"}),
-                right: &Value::Number(17),
-                operator: MathOperator::OP_MULT
-            }
-            ),
-            Expr::FunDefinition(FunDefinition {
-                name: "adder", contents: vec![
-                    Expr::MathExpr(
-                        Math {
-                            left: &Value::Param(ParamReference {param_number: 0}),
-                            right: &Value::Param(ParamReference {param_number: 1}),
-                            operator: MathOperator::OP_ADD
-                        }
-                    )
-                ]
-            }),
+    // let fc = fasm_codegen!(
+    // 	vec![
+    //         Expr::VarDefinition(VarDefinition {name: "goren", value: Value::Number(10)}),
+    //         Expr::MathExpr(Math {
+    //             left: &Value::Var(VarReference { name: "goren"}),
+    //             right: &Value::Number(17),
+    //             operator: MathOperator::OP_MULT
+    //         }
+    //         ),
+    //         Expr::FunDefinition(FunDefinition {
+    //             name: "adder", contents: vec![
+    //                 Expr::MathExpr(
+    //                     Math {
+    //                         left: &Value::Param(ParamReference {param_number: 0}),
+    //                         right: &Value::Param(ParamReference {param_number: 1}),
+    //                         operator: MathOperator::OP_ADD
+    //                     }
+    //                 )
+    //             ]
+    //         }),
 
-            Expr::FunCall(
-                FunCall {
-                    name: "adder",
-                    params: vec![Value::Var(VarReference {name: "goren"}), Value::Number(6)]
-                }
-            ),
+    //         Expr::FunCall(
+    //             FunCall {
+    //                 name: "adder",
+    //                 params: vec![Value::Var(VarReference {name: "goren"}), Value::Number(6)]
+    //             }
+    //         ),
             
-            Expr::Breakpoint
-	]
-    );
+    //         Expr::Breakpoint
+    // 	]
+    // );
 
-    println!("{}", fc);
+    
+    // println!("{}", fc);
+    println!("{:?}", lex_str("fnaf main() {}"));
 }
