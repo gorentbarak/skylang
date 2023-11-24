@@ -42,5 +42,5 @@ fn main() {
 
     
     // println!("{}", fc);
-    println!("{:?}", lex_str("fnaf main() {}"));
+    println!("{:#?}", lex_str("macro_rules! println { () => {} }"))
 }

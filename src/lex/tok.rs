@@ -5,7 +5,7 @@ use core::iter::Peekable;
 
 pub use TokenType::*;
 
-#[derive(Debug, Logos)]
+#[derive(Debug, Logos, PartialEq, Eq)]
 #[logos(skip r"[ \t\n\f]+")]
 pub enum TokenType {
     // SINGLE CHARACTER TOKENS
@@ -81,11 +81,11 @@ pub enum TokenType {
     GreaterEqual,	// >=
     
     // LITERALS
-    #[regex("(\"[^\".+]\")|('[^'.+]')")]
+    #[regex(r#"("[^"]*")|('[^']*')"#)]
     String,	// A string literal.
     #[regex("[0-9]+")]
     Number,	// An integer.
-    #[regex(r#"[^[0-9]^"^-^[ \t\n\f]^\.^=^(^)^{^}.]+[^"^-^=^\..^[ \t\n\f]^(^)^{^}]*"#)]
+    #[regex(r#"[^[0-9]^"^-^[ \t\n\f]^\.^=^(^)^{^}.^,^;]+[^"^-^=^\..^[ \t\n\f]^(^)^{^}^,^;]*"#)]
     Identifier, // An identifier.
     #[token("true")]
     True,	// true
@@ -95,11 +95,12 @@ pub enum TokenType {
     Null,	// none
 }
 
-pub fn lex_str(this: &str) -> Vec<TokenType> {
+pub fn lex_str(this: &str) -> Vec<(TokenType, &str)> {
+    println!("\"{}\"", this);
     let mut buf = Vec::new();
     let mut lexer = TokenType::lexer(this);
     while let Some(Ok(token)) = lexer.next() {
-	buf.push(token);
+	buf.push((token, lexer.slice()));
     }
 
     buf
