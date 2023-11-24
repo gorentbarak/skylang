@@ -7,12 +7,19 @@ macro_rules! fasm_codegen {
 	fasm_codegen(&$exprs, true)
     };
 
-    (function: $exprs:expr) => {
+    (fun: $exprs:expr) => {
 	fasm_codegen($exprs, false)
     }
 }
 
+pub fn temp(counter: u64) -> String {
+    format!("tmp{:?}", counter)
+}
+
 pub fn fasm_codegen(exprs: &Vec<Expr>, not_a_function: bool) -> String {
+    // A counter for how many temporary variables have been created. This is used to create new ones. The new ones will be called tmp1, tmp2, etc.
+    let mut tmp_counter: u64 = 0;
+    
     // Define asm_func, used for functions.
     let mut asm_func = String::new();
     // Define asm_data, used for variables.
@@ -140,13 +147,16 @@ pub fn fasm_codegen(exprs: &Vec<Expr>, not_a_function: bool) -> String {
 	    Expr::Breakpoint       => {
 		// Write the interrupt for a debugger breakpoint.
 		asm_start.push_str("\tint3\n");
+		asm_start.push_str("\txor rax, rax\n");
 	    },
 
 	    // Return something from a function.
 	    Expr::Return(e)        => {
+		// Do the operation that should later be returned.
+		asm_start.push_str(fasm_codegen!(fun: &e));
 		// Move the return value to rbp + 8.
-		asm_start.push_str(format!("mov [rbp + 8], {}", e.unwrap()).as_str());
-		// [rbp + 8] ← return_value
+		asm_start.push_str("mov [rbp + 8], rax");
+		// 8(%rbp) ← return_value
 	    },
 
 	    // A function defenition.
@@ -154,18 +164,44 @@ pub fn fasm_codegen(exprs: &Vec<Expr>, not_a_function: bool) -> String {
 		// In x86-64 assembly, a function is defined as <function_name>:. Push this to the `asm_func`.
                 asm_func.push_str(format!("{}:\n", e.name).as_str());
 		// Call the function itself specifying that you are defining a function, and push the returned value to `asm_func`.
-	        asm_func.push_str(fasm_codegen!(function: &e.contents).as_str());
+	        asm_func.push_str(fasm_codegen!(fun: &e.contents).as_str());
 		// Use the ret instruction to return from the procedure.
                 asm_func.push_str("\tret\n");
             },
 
+	    Expr::If(e) => {
+		// Increment the temporary variable/function counter.
+		tmp_counter += 1;
+		// Compare the left and right value.
+		asm_start.push_str(format!("\tcmp {}, {}\n", e.left.unwrap(), e.right.unwrap()).as_str());
+		// Check what the condition is.
+		match e.cond {
+		    COND_OP::EQ => {
+			// If the compared values are equal to each other jump to the temporary function.
+			asm_start.push_str(format!("je .{}", temp(tmp_counter)).as_str());
+		    },
+
+		    COND_OP::NE => {
+			// If the compared values are not equal to eachother jump to the temporary function.
+			asm_start.push_str(format!("jne .{}", temp(tmp_counter)).as_str());
+		    }
+		}
+
+		// Create the temporary function.
+                asm_func.push_str(format!(".{}:\n", temp(tmp_counter)).as_str());
+	        asm_func.push_str(fasm_codegen!(fun: &e.action).as_str());
+                asm_func.push_str("\tret\n");
+
+	    }
+	    
 	    _ => unsafe {
 		// Write some data I randomly typed to your memory because don't going around playing with something that I haven't implemented yet.
 		let mut ptr = 0x00 as *mut f64;
 		::std::ptr::write(ptr, 124010240120401240.12410240124120401240);
 	    },
 	}
-        
+
+	
     }
     
 

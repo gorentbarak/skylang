@@ -1,11 +1,13 @@
+use std::rc::Rc;
+
 #[derive(Debug)]
 pub enum Expr<'a> {
     MathExpr(Math<'a>),
     FunCall(FunCall<'a>),
     FunDefinition(FunDefinition<'a>),
     VarDefinition(VarDefinition<'a>),
-    Return(Value<'a>),
-    If(IfStatement<'a>),
+    Return(Vec<Expr<'a>>),
+    If(IfCondition<'a>),
     Breakpoint
 }
 
@@ -79,16 +81,11 @@ pub enum Value<'a> {
 }
 
 #[derive(Debug)]
-pub struct IfStatement<'a> {
-    pub condition: Condition<'a>,
-    pub if_true: Vec<Expr<'a>>,
-}
-
-#[derive(Debug)]
-pub struct Condition<'a> {
+pub struct IfCondition<'a> {
     pub left: Value<'a>,
     pub right: Value<'a>,
-    pub between: COND_OP,
+    pub cond: COND_OP,
+    pub action: Vec<Expr<'a>>
 }
 
 #[derive(Debug)]
