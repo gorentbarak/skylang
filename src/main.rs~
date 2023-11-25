@@ -1,5 +1,0 @@
-pub mod lex;
-
-fn main() {
-    println!("{:?}", lex::parse::match_identifier("goren-"));
-}
